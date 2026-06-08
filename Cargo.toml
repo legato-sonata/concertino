@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "programs/concertino-amm",
+    "backend"
+]
+resolver = "2"
