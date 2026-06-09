@@ -74,7 +74,7 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn health() -> Json<serde_json::json!(Object)> {
+async fn health() -> Json<serde_json::Value> {
     Json(serde_json::json!({ "status": "🎼 Harmonious" }))
 }
 

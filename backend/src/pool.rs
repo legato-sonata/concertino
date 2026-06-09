@@ -12,6 +12,12 @@ pub struct PoolState {
     pub theme: String,
 }
 
+impl Default for PoolManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PoolManager {
     pub fn new() -> Self {
         PoolManager {
@@ -85,7 +91,7 @@ impl IntSqrt for u128 {
             return 0;
         }
         let mut x = self;
-        let mut y = (x + 1) / 2;
+        let mut y = x.div_ceil(2);
         while y < x {
             x = y;
             y = (x + self / x) / 2;
