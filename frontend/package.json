@@ -14,9 +14,10 @@
     "svelte": "^4.0.0"
   },
   "dependencies": {
-    "@solana/web3.js": "^1.87.0",
-    "@solana/wallet-adapter-base": "^0.9.0",
-    "@solana/wallet-adapter-svelte": "^0.9.0",
+    "@solana/web3.js": "^1.98.4",
+    "@solana/wallet-adapter-base": "^0.9.27",
+    "@aztemi/svelte-on-solana-wallet-adapter-core": "^1.2.2",
+    "@aztemi/svelte-on-solana-wallet-adapter-ui": "^1.2.2",
     "@solana/wallet-adapter-wallets": "^0.19.0"
   }
 }
