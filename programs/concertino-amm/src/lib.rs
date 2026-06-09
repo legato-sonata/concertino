@@ -49,8 +49,8 @@ pub mod concertino_amm {
 
         // Calculate output with fee: (amount_in * 997) / 1000 for 0.3% fee
         let amount_in_with_fee = (amount_in as u128) * 997 / 1000;
-        let amount_out = (amount_in_with_fee * reserve_out as u128)
-            / (reserve_in as u128 + amount_in_with_fee);
+        let amount_out =
+            (amount_in_with_fee * reserve_out as u128) / (reserve_in as u128 + amount_in_with_fee);
 
         require!(
             amount_out >= min_amount_out as u128,
@@ -149,17 +149,25 @@ pub mod concertino_amm {
                 authority: ctx.accounts.pool_signer.to_account_info(),
             },
         );
-        let seeds = &[b"pool", pool.token_a.as_ref(), pool.token_b.as_ref(), &[pool.bump]];
+        let seeds = &[
+            b"pool",
+            pool.token_a.as_ref(),
+            pool.token_b.as_ref(),
+            &[pool.bump],
+        ];
         let signer_seeds = &[&seeds[..]];
-        token::mint_to(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            token::MintTo {
-                mint: ctx.accounts.lp_token_mint.to_account_info(),
-                to: ctx.accounts.user_lp_token.to_account_info(),
-                authority: ctx.accounts.pool_signer.to_account_info(),
-            },
-            signer_seeds,
-        ), lp_amount)?;
+        token::mint_to(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                token::MintTo {
+                    mint: ctx.accounts.lp_token_mint.to_account_info(),
+                    to: ctx.accounts.user_lp_token.to_account_info(),
+                    authority: ctx.accounts.pool_signer.to_account_info(),
+                },
+                signer_seeds,
+            ),
+            lp_amount,
+        )?;
 
         pool.reserve_a += amount_a;
         pool.reserve_b += amount_b;
