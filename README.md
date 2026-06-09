@@ -1,20 +1,20 @@
-# Concertino 🎻
+# Concertino
 
-**Concertino**: A Solana AMM (Automated Market Maker) orchestrated around classical Vatican orchestral music themes.
+**Concertino** is a Solana AMM (Automated Market Maker) centered around classical Vatican orchestral music themes.
 
 ## Overview
 
-Concertino is a production-ready DeFi AMM on Solana featuring:
+Concertino is a DeFi AMM on Solana featuring:
 - **Smart Contract (Rust)**: Core AMM logic with constant product formula (x*y=k)
 - **Backend (Rust)**: Transaction builder, pool indexing, fee management
 - **Frontend (Svelte)**: Swap UI, liquidity provision, pool management
 
-### Theme: Vatican Classical Orchestral 🎼
-- **Pools** = Orchestral Sections (Strings, Woodwinds, Brass)
-- **Swaps** = Musical Movements
-- **Liquidity Providers** = Maestros
-- **Fees** = Harmonic Rates
-- **Slippage** = Tempo Variation
+### Theme: Vatican Classical Orchestral
+- **Pools**: Orchestral Sections (Strings, Woodwinds, Brass)
+- **Swaps**: Musical Movements
+- **Liquidity Providers**: Maestros
+- **Fees**: Harmonic Rates
+- **Slippage**: Tempo Variation
 
 ## Project Structure
 
@@ -73,22 +73,22 @@ cd frontend && npm run dev
 ## Features (MVP)
 
 ### Smart Contract
-- ✅ Initialize liquidity pools (Violin, Cello, Viola sections)
-- ✅ Swap tokens with 0.3% fee
-- ✅ Provide/withdraw liquidity
-- ✅ Calculate price with constant product formula
+- Initialize liquidity pools (Violin, Cello, Viola sections)
+- Swap tokens with 0.3% fee
+- Provide/withdraw liquidity
+- Calculate price with constant product formula
 
 ### Backend
-- ✅ Pool state indexing
-- ✅ Transaction building
-- ✅ Price calculation & slippage simulation
-- ✅ Fee distribution logic
+- Pool state indexing
+- Transaction building
+- Price calculation & slippage simulation
+- Fee distribution logic
 
 ### Frontend
-- ✅ Connect wallet (Phantom)
-- ✅ Swap UI with price impact display
-- ✅ Add/remove liquidity forms
-- ✅ Real-time pool stats
+- Connect wallet (Phantom)
+- Swap UI with price impact display
+- Add/remove liquidity forms
+- Real-time pool stats
 
 ## Network
 **Devnet** (Solana Testnet) - ready to deploy
