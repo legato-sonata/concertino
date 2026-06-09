@@ -16,7 +16,7 @@ impl IntSqrt for u128 {
             return 0;
         }
         let mut x = self;
-        let mut y = (x + 1) / 2;
+        let mut y = x.div_ceil(2);
         while y < x {
             x = y;
             y = (x + self / x) / 2;
