@@ -81,10 +81,12 @@ impl PoolManager {
     }
 }
 
+#[allow(dead_code)]
 trait IntSqrt {
     fn isqrt(self) -> Self;
 }
 
+#[allow(dead_code)]
 impl IntSqrt for u128 {
     fn isqrt(self) -> Self {
         if self == 0 {
