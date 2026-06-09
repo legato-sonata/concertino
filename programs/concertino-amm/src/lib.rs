@@ -197,8 +197,8 @@ pub mod concertino_amm {
 #[derive(Accounts)]
 pub struct InitializePool<'info> {
     #[account(
-        init, 
-        payer = user, 
+        init,
+        payer = user,
         space = 8 + Pool::INIT_SPACE,
         seeds = [b"pool", token_a.key().as_ref(), token_b.key().as_ref()],
         bump
