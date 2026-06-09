@@ -1,10 +1,29 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Token, TokenAccount, Transfer};
+use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
 
 declare_id!("11111111111111111111111111111111");
 
 mod state;
 use state::*;
+
+pub trait IntSqrt {
+    fn isqrt(self) -> Self;
+}
+
+impl IntSqrt for u128 {
+    fn isqrt(self) -> Self {
+        if self == 0 {
+            return 0;
+        }
+        let mut x = self;
+        let mut y = (x + 1) / 2;
+        while y < x {
+            x = y;
+            y = (x + self / x) / 2;
+        }
+        x
+    }
+}
 
 #[program]
 pub mod concertino_amm {
@@ -18,8 +37,8 @@ pub mod concertino_amm {
         fee_basis_points: u16, // 30 = 0.3%
     ) -> Result<()> {
         let pool = &mut ctx.accounts.pool;
-        pool.token_a = ctx.accounts.token_a.mint;
-        pool.token_b = ctx.accounts.token_b.mint;
+        pool.token_a = ctx.accounts.token_a.key();
+        pool.token_b = ctx.accounts.token_b.key();
         pool.reserve_a = 0;
         pool.reserve_b = 0;
         pool.fee_basis_points = fee_basis_points;
@@ -41,11 +60,12 @@ pub mod concertino_amm {
         let pool = &mut ctx.accounts.pool;
 
         // Determine which token is input
-        let (reserve_in, reserve_out, is_a_to_b) = if ctx.accounts.token_in.mint == pool.token_a {
-            (pool.reserve_a, pool.reserve_b, true)
-        } else {
-            (pool.reserve_b, pool.reserve_a, false)
-        };
+        let (reserve_in, reserve_out, is_a_to_b) =
+            if ctx.accounts.user_token_in.mint == pool.token_a {
+                (pool.reserve_a, pool.reserve_b, true)
+            } else {
+                (pool.reserve_b, pool.reserve_a, false)
+            };
 
         // Calculate output with fee: (amount_in * 997) / 1000 for 0.3% fee
         let amount_in_with_fee = (amount_in as u128) * 997 / 1000;
@@ -93,7 +113,7 @@ pub mod concertino_amm {
             pool.reserve_a -= amount_out as u64;
         }
 
-        emit!(Swap {
+        emit!(SwapEvent {
             amount_in,
             amount_out: amount_out as u64,
             token_a: pool.token_a,
@@ -110,7 +130,7 @@ pub mod concertino_amm {
 
         let lp_amount = if lp_supply == 0 {
             ((amount_a as u128) * (amount_b as u128))
-                .integer_sqrt()
+                .isqrt()
                 .try_into()
                 .unwrap()
         } else {
@@ -141,14 +161,6 @@ pub mod concertino_amm {
         token::transfer(cpi_ctx_b, amount_b)?;
 
         // Mint LP tokens
-        let cpi_ctx_mint = CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            token::MintTo {
-                mint: ctx.accounts.lp_token_mint.to_account_info(),
-                to: ctx.accounts.user_lp_token.to_account_info(),
-                authority: ctx.accounts.pool_signer.to_account_info(),
-            },
-        );
         let seeds = &[
             b"pool",
             pool.token_a.as_ref(),
@@ -184,10 +196,16 @@ pub mod concertino_amm {
 
 #[derive(Accounts)]
 pub struct InitializePool<'info> {
-    #[account(init, payer = user, space = 8 + Pool::INIT_SPACE)]
+    #[account(
+        init, 
+        payer = user, 
+        space = 8 + Pool::INIT_SPACE,
+        seeds = [b"pool", token_a.key().as_ref(), token_b.key().as_ref()],
+        bump
+    )]
     pub pool: Account<'info, Pool>,
-    pub token_a: Account<'info, token::Mint>,
-    pub token_b: Account<'info, token::Mint>,
+    pub token_a: Account<'info, Mint>,
+    pub token_b: Account<'info, Mint>,
     #[account(mut)]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
@@ -225,7 +243,7 @@ pub struct AddLiquidity<'info> {
     #[account(mut)]
     pub pool_token_b: Account<'info, TokenAccount>,
     #[account(mut)]
-    pub lp_token_mint: Account<'info, token::Mint>,
+    pub lp_token_mint: Account<'info, Mint>,
     pub pool_signer: SystemAccount<'info>,
     pub user: Signer<'info>,
     pub token_program: Program<'info, Token>,
@@ -240,7 +258,7 @@ pub struct PoolInitialized {
 }
 
 #[event]
-pub struct Swap {
+pub struct SwapEvent {
     pub amount_in: u64,
     pub amount_out: u64,
     pub token_a: Pubkey,
