@@ -60,10 +60,10 @@ impl PoolManager {
     pub fn add_liquidity(&mut self, theme: &str, amount_a: u64, amount_b: u64) -> Option<u64> {
         if let Some(pool) = self.pools.get_mut(theme) {
             // Simplified LP calculation
-            let lp_amount = ((amount_a as u128 * amount_b as u128)
-                .isqrt()
-                .min(((amount_a as u128 * pool.reserve_b as u128) / pool.reserve_a as u128)
-                    .min(amount_b as u128))) as u64;
+            let lp_amount = ((amount_a as u128 * amount_b as u128).isqrt().min(
+                ((amount_a as u128 * pool.reserve_b as u128) / pool.reserve_a as u128)
+                    .min(amount_b as u128),
+            )) as u64;
 
             pool.reserve_a += amount_a;
             pool.reserve_b += amount_b;

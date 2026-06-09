@@ -37,27 +37,25 @@ pub mod concertino_amm {
     }
 
     /// Swap tokens (Musical Movement)
-    pub fn swap(
-        ctx: Context<Swap>,
-        amount_in: u64,
-        min_amount_out: u64,
-    ) -> Result<()> {
+    pub fn swap(ctx: Context<Swap>, amount_in: u64, min_amount_out: u64) -> Result<()> {
         let pool = &mut ctx.accounts.pool;
 
         // Determine which token is input
-        let (reserve_in, reserve_out, is_a_to_b) =
-            if ctx.accounts.token_in.mint == pool.token_a {
-                (pool.reserve_a, pool.reserve_b, true)
-            } else {
-                (pool.reserve_b, pool.reserve_a, false)
-            };
+        let (reserve_in, reserve_out, is_a_to_b) = if ctx.accounts.token_in.mint == pool.token_a {
+            (pool.reserve_a, pool.reserve_b, true)
+        } else {
+            (pool.reserve_b, pool.reserve_a, false)
+        };
 
         // Calculate output with fee: (amount_in * 997) / 1000 for 0.3% fee
         let amount_in_with_fee = (amount_in as u128) * 997 / 1000;
         let amount_out = (amount_in_with_fee * reserve_out as u128)
             / (reserve_in as u128 + amount_in_with_fee);
 
-        require!(amount_out >= min_amount_out as u128, AMMError::SlippageExceeded);
+        require!(
+            amount_out >= min_amount_out as u128,
+            AMMError::SlippageExceeded
+        );
 
         // Transfer tokens
         let cpi_accounts = Transfer {
@@ -75,9 +73,15 @@ pub mod concertino_amm {
             authority: ctx.accounts.pool_signer.to_account_info(),
         };
         let cpi_program_out = ctx.accounts.token_program.to_account_info();
-        let seeds = &[b"pool", pool.token_a.as_ref(), pool.token_b.as_ref(), &[pool.bump]];
+        let seeds = &[
+            b"pool",
+            pool.token_a.as_ref(),
+            pool.token_b.as_ref(),
+            &[pool.bump],
+        ];
         let signer_seeds = &[&seeds[..]];
-        let cpi_ctx_out = CpiContext::new_with_signer(cpi_program_out, cpi_accounts_out, signer_seeds);
+        let cpi_ctx_out =
+            CpiContext::new_with_signer(cpi_program_out, cpi_accounts_out, signer_seeds);
         token::transfer(cpi_ctx_out, amount_out as u64)?;
 
         // Update reserves
@@ -100,11 +104,7 @@ pub mod concertino_amm {
     }
 
     /// Add liquidity (Maestro joins the orchestra)
-    pub fn add_liquidity(
-        ctx: Context<AddLiquidity>,
-        amount_a: u64,
-        amount_b: u64,
-    ) -> Result<()> {
+    pub fn add_liquidity(ctx: Context<AddLiquidity>, amount_a: u64, amount_b: u64) -> Result<()> {
         let pool = &mut ctx.accounts.pool;
         let lp_supply = ctx.accounts.lp_token_mint.supply;
 
